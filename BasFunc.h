@@ -28,12 +28,23 @@ namespace BasFunc {
 		bool isNorm() {
 			return isNor;
 		}
+		bool isZero() {
+			if (now.compare("0") == 0 && isNor) {
+				return true;
+			}
+			return false;
+		}
 	private:
 
 	protected:
 		std::string now;
 		std::string last;
 		bool isNor = false;
+		/// <summary>
+		/// 字符转浮点
+		/// </summary>
+		/// <param name="s">字符数字</param>
+		/// <returns>浮点数字</returns>
 		double str2d(std::string s) {
 			int p = 0, len = 5;
 			double f = 1;
@@ -69,6 +80,12 @@ namespace BasFunc {
 		std::string d2str(double x) {
 			return ridz(std::to_string(x));
 		}
+
+		/// <summary>
+		/// 擦除浮点小数多余0
+		/// </summary>
+		/// <param name="s">字符</param>
+		/// <returns>被擦除的字符</returns>
 		std::string ridz(std::string s) {
 			int p = s.length() - 1;
 			int t = s.length() - 2;
@@ -142,6 +159,9 @@ namespace BasFunc {
 			if (tpara == 0) {
 				now = d2str(lpara);
 				isNor = true;
+			}
+			else if (tpara == 1) {
+				now = d2str(lpara) + "x";
 			}
 			else {
 				now = d2str(lpara) + "x";
