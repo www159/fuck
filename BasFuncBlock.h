@@ -24,13 +24,20 @@ namespace BasFuncBlock {
 		void setTag(int t) {
 			this->tag = t;
 		}
+		inline int getTag() {
+			return this->tag;
+		}
 	protected:
 		/// <summary>
 		/// 通过标识符向下造型
 		/// </summary>
 		int tag;
 	};
+	/// <summary>
+	/// 加法函数块和减法函数块合并
+	/// </summary>
 	class AddFuncBlock :public AbsFuncBlock {
+	public:
 		void dt() {
 			afb[0]->dt();
 			afb[1]->dt();
@@ -38,7 +45,23 @@ namespace BasFuncBlock {
 		std::string rtStr() {
 			std::string afb0 = afb[0]->rtStr();
 			std::string afb1 = afb[1]->rtStr();
-			afb0 = afb0 + "+";
+			//判断纯幂函数串是否为0。
+			if (afb0.empty() && afb1.empty()) {
+				return "";
+			}
+			else if (afb0.empty()) {
+				return afb1;
+			}
+			else if (afb1.empty()) {
+				return afb0;
+			}
+
+			if (tag == ADD) {
+				afb0 = afb0 + "+";
+			}
+			else {
+				afb0 = afb0 + "-";
+			}
 			afb0 = afb0 + afb1;
 			return afb0;
 		}
@@ -64,6 +87,11 @@ namespace BasFuncBlock {
 			abf->dt();
 		}
 		std::string rtStr() {
+			if (tag == PWR) {
+				if (abf->isZero()) {
+					return "";
+				}
+			}
 			return abf->rtStr();
 		}
 		/// <summary>
@@ -72,6 +100,7 @@ namespace BasFuncBlock {
 		/// <param name="s">读入字符串</param>
 		void load(std::string s) {
 			//单元块load需要switch
+			//TODO
 			if (s.find("arc") != s.npos) {
 
 			}
