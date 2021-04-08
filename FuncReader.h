@@ -125,13 +125,8 @@ namespace FuncReader {
 				p = q;
 			}
 			trans1();
-			trans2();
 		}
 
-			/// <summary>
-			/// 获取生成的总函数块
-			/// </summary>
-			/// <returns>总函数块</returns>
 			AbsFuncBlock* getAfb() {
 				return this->Afb;
 			}
@@ -246,76 +241,16 @@ namespace FuncReader {
 					}
 					break;
 				}
+					   while (!temsta.empty()) {
+						   AbsFuncBlock* afb = new NoneFuncBlock;
+						   afb->setTag(temsta.top());
+						   bacQue.push(afb);
+						   temsta.pop();
+						}
 				}
-			}
-			while (!temsta.empty()) {
-				AbsFuncBlock* afb = new NoneFuncBlock;
-				afb->setTag(temsta.top());
-				bacQue.push(afb);
-				temsta.pop();
 			}
 		}
 
-		/// <summary>
-		/// 根据后缀表达式生成函数单元
-		/// </summary>
-		void trans2() {
-			std::stack<AbsFuncBlock*> afbStack;
-			AbsFuncBlock* afb1, * afb2, *afb3;
-			while (!bacQue.empty()) {
-				afb1 = bacQue.front();
-				bacQue.pop();
-
-				int tag = afb1->getTag();
-				switch (tag) {
-				case ADD: case MINU:case DIV: case MULT: {
-					afb2 = afbStack.top();
-					afbStack.pop();
-					afb3 = afbStack.top();
-					afbStack.pop();
-					AbsFuncBlock* afb0 = BlockGenr(tag, afb3, afb2);
-					afbStack.push(afb0);
-					break;
-				}
-				default: {
-					afbStack.push(afb1);
-				}
-				}
-			}
-			afb2 = afbStack.top();
-			afbStack.pop();
-			this->Afb = afb2;
-		}
-		 /// <summary>
-		 /// 函数块生成器
-		 /// </summary>
-		 /// <param name="tag">标识符</param>
-		 /// <param name="afb1">函数子块1</param>
-		 /// <param name="afb2">函数子块2</param>
-		 /// <returns>组合函数块</returns>
-		 AbsFuncBlock* BlockGenr(int tag, AbsFuncBlock* afb1, AbsFuncBlock* afb2) {
-			switch (tag) {
-			case ADD: {
-				AddFuncBlock* adfb = new AddFuncBlock;
-				adfb->setTag(ADD);
-				adfb->load(afb1, afb2);
-				return adfb;
-			}
-			case MINU: {
-				AddFuncBlock* mifb = new AddFuncBlock;
-				mifb->setTag(MINU);
-				mifb->load(afb1, afb2);
-				return mifb;
-			}
-			case MULT: {
-
-			}
-			case DIV: {
-
-			}
-			default:return NULL;
-			}
-			return NULL;
-		}
+		void trans2(){}
 	};
 }
