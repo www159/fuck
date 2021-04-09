@@ -18,6 +18,16 @@ namespace BasFunc {
 		/// </summary>
 		/// <returns></returns>
 		virtual std::string rtStr() = 0;
+		virtual AbsBasFunc* copy() = 0;
+		/// <summary>
+		/// 传入参数，用于上层合并参数。
+		/// </summary>
+		/// <param name="s">参数字符串</param>
+		virtual void loadLpara(double s) = 0;
+
+		double getLpara() {
+			return this->lpara;
+		}
 		/// <summary>
 		/// 后悔函数。撤销操作，只支持一步撤销
 		/// </summary>
@@ -39,6 +49,7 @@ namespace BasFunc {
 	protected:
 		std::string now;
 		std::string last;
+		double lpara = 0.0;
 		bool isNor = false;
 		/// <summary>
 		/// 字符转浮点
@@ -180,8 +191,16 @@ namespace BasFunc {
 			return now;
 		}
 
+		AbsBasFunc* copy() {
+			AbsBasFunc* pwAbf = new BasPwrFunc;
+			pwAbf->load(this->now);
+			return pwAbf;
+		}
+
+		void loadLpara(double s) {
+			this->lpara;
+		}
 	private:
-		double lpara = 0.0;
 		double tpara = 0.0;
 	};
 }

@@ -21,18 +21,51 @@ namespace BasFuncBlock {
 	public:
 		virtual void dt() = 0;
 		virtual std::string rtStr() = 0;
+
+		/// <summary>
+		/// 复制函数
+		/// </summary>
+		/// <returns>该函数块的复制对象</returns>
+		virtual AbsFuncBlock* copy() = 0;
+
 		void setTag(int t) {
 			this->tag = t;
 		}
+
+		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1) {
+			afb[0] = afb0;
+			afb[1] = afb1;
+		}	
+
 		inline int getTag() {
-			return this->tag;
+			return tag;
 		}
 	protected:
 		/// <summary>
 		/// 通过标识符向下造型
 		/// </summary>
 		int tag;
+		AbsFuncBlock* afb[2] = {NULL};
+
+		/// <summary>
+		/// 是否为单元
+		/// </summary>
+		/// <returns>true 是单元</returns>
+		inline bool isUnit() {
+			switch (tag)
+			{
+			case ADD: case MULT: case MINU:case DIV: {
+				return true;
+				break;
+			}
+			default:return false;
+				break;
+			}
+			return false;
+		}
 	};
+
+
 	/// <summary>
 	/// 加法函数块和减法函数块合并
 	/// </summary>
@@ -66,13 +99,55 @@ namespace BasFuncBlock {
 			return afb0;
 		}
 
-		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1) {
-			afb[0] = afb0;
-			afb[1] = afb1;
+		/// <summary>
+		/// 对块进行复制
+		/// </summary>
+		/// <returns>被复制的块</returns>
+		AbsFuncBlock* copy() {
+			AbsFuncBlock* blockUnit1, * blockUnit2, *newAfb;
+			newAfb = new AddFuncBlock;
+			blockUnit1 = afb[0]->copy();
+			blockUnit2 = afb[1]->copy();
+			newAfb->load(blockUnit1, blockUnit2);
+			return newAfb;
 		}
-	private:
-		AbsFuncBlock* afb[2];
 	};
+
+
+	/// <summary>
+	/// 乘法函数块，因为其求导最终转化为一般加法式，
+	/// 因此需要借助外层二元组进行删改。
+	/// </summary>
+	class MultFuncBlock :public AbsFuncBlock {
+	public:
+		/// <summary>
+		/// 乘法单元求导，需要外部求导造型成加法单元
+		/// 更新两个子单元
+		/// </summary>
+		void dt() {
+			AbsFuncBlock* mulUnit1, * mulUnit2, * t1, * t2;
+			mulUnit1 = new MultFuncBlock;
+			mulUnit2 = new MultFuncBlock;
+			t1 = afb[0]->copy();
+			t2 = afb[1]->copy();
+			//乘法法则
+			mulUnit1->load(t1, afb[1]);
+			mulUnit1->setTag(MULT);
+			mulUnit2->load(afb[0], t2);
+			mulUnit2->setTag(MULT);
+		}
+		std::string rtStr() {
+
+		}
+		AbsFuncBlock* copy() {
+			AbsFuncBlock* blockUnit1, * blockUnit2, * newAfb;
+			newAfb = new MultFuncBlock;
+			blockUnit1 = afb[0]->copy();
+			blockUnit2 = afb[1]->copy();
+			newAfb->load(blockUnit1, blockUnit2);
+			return newAfb;
+		}
+};
 	/// <summary>
 	/// 函数单元块，只装一个函数。
 	/// </summary>
@@ -119,6 +194,13 @@ namespace BasFuncBlock {
 			}
 			abf->load(s);
 		}
+		AbsFuncBlock* copy() {
+			AbsBasFunc* newAbf;
+			UnitFuncBlock* newAfb = new UnitFuncBlock;
+			newAbf = abf->copy();
+			newAfb->load(newAbf->rtStr());
+			return newAfb;
+		}
 	private:
 		AbsBasFunc* abf = NULL;
 	};
@@ -128,8 +210,8 @@ namespace BasFuncBlock {
 	/// </summary>
 	class NoneFuncBlock :public AbsFuncBlock {
 		void dt(){}
-		std::string rtStr() { return NULL; }
+		std::string rtStr() { return ""; }
 		void load(std::string){}
-		
+		AbsFuncBlock* copy(){}
 	};
 }
