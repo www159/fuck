@@ -57,8 +57,6 @@ namespace BasFuncBlock {
 
 
 	std::string AddFuncBlock::rtStr() {
-		std::string afb0 = afb[0]->rtStr();
-		std::string afb1 = afb[1]->rtStr();
 		//ÅÐ¶Ï´¿ÃÝº¯Êý´®ÊÇ·ñÎª0¡£
 		if (isZer) {
 			return "";
