@@ -139,7 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasFunc.cpp" />
+    <ClCompile Include="BasFuncBlock.cpp" />
     <ClCompile Include="fuck.cpp" />
+    <ClCompile Include="FuncReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasFunc.h" />

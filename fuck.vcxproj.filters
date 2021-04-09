@@ -18,6 +18,15 @@
     <ClCompile Include="fuck.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="BasFunc.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BasFuncBlock.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FuncReader.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasFunc.h">
