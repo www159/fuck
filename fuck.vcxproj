@@ -148,6 +148,7 @@
     <ClInclude Include="BasFunc.h" />
     <ClInclude Include="BasFuncBlock.h" />
     <ClInclude Include="FuncReader.h" />
+    <ClInclude Include="FindComposite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

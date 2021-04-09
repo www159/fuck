@@ -18,14 +18,14 @@
     <ClCompile Include="fuck.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="BasFunc.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="FuncReader.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="BasFuncBlock.cpp">
-      <Filter>头文件</Filter>
+      <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FuncReader.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="BasFunc.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +36,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="FuncReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FindComposite.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

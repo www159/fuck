@@ -1,19 +1,20 @@
 ﻿// fuck.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
-#include "FuncReader.h"
 #include<iostream>
+#include "FuncReader.h"
+#include "comFinder.h"
 using namespace FuncReader;
 int main()
 {
-	GnlFuncReader* gfr = new GnlFuncReader;
+	/*GnlFuncReader* gfr = new GnlFuncReader;
 	gfr->load("100x+399x^(-2)");
 	AbsFuncBlock* afb = gfr->getAfb();
 	delete gfr;
 	afb->dt();
 	afb->dt();
 	std::cout << afb->rtStr() << std::endl;
-	return 0;
+	return 0;*/
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
