@@ -52,11 +52,13 @@ namespace BasFuncBlock {
 			transBlock = static_cast<AddFuncBlock*>(static_cast<AbsFuncBlock*>(afb[1]));
 			transBlock->setTag(ADD);
 			afb[1] = transBlock;
-		}
+	}
 	}
 
 
 	std::string AddFuncBlock::rtStr() {
+		std::string afb0 = afb[0]->rtStr();
+		std::string afb1 = afb[1]->rtStr();
 		//判断纯幂函数串是否为0。
 		if (isZer) {
 			return "";
@@ -144,8 +146,8 @@ namespace BasFuncBlock {
 		//如果子块出现0，则返回空串。
 		if (t1 || t2) {
 			isZer = true;
-			return "";
-		}
+		return "";
+	}
 
 		std::string rt;
 		if (tag1 / 10 <= 1) {
@@ -211,7 +213,7 @@ namespace BasFuncBlock {
 	}
 	
 
-	
+
 	void UnitFuncBlock::load(std::string s) {
 		//单元块load需要switch
 		//TODO

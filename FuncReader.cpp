@@ -9,6 +9,7 @@ namespace FuncReader {
 		int p, q, r, t, isSpecFunc;
 		p = q = 0;
 		r = -1;
+		t = -1;
 		//当前读到的符号下标
 		int Signtag = 0;
 		int INCNT = 0;
