@@ -119,7 +119,7 @@ namespace BasFunc {
 	void BasPwrFunc::dt() {
 		if (isNor) {
 			last = now;
-			now = "0";
+			now = "";
 			return;
 		}
 		last = now;

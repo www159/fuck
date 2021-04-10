@@ -2,14 +2,9 @@
 namespace BasFuncBlock {
 	using namespace BasFunc;
 	/**************************************************************************/
+	
 	void AbsFuncBlock::setTag(int t) {
 		this->tag = t;
-	}
-
-
-	void AbsFuncBlock::load(AbsFuncBlock* afb0, AbsFuncBlock* afb1) {
-		afb[0] = afb0;
-		afb[1] = afb1;
 	}
 
 
@@ -36,53 +31,104 @@ namespace BasFuncBlock {
 		return isNor;
 	}
 
+	bool AbsFuncBlock::isZero() {
+		return isZer;
+	}
+
+	bool AbsFuncBlock::isMult() {
+		return isMul;
+	}
+
+	double AbsFuncBlock::getLparam() {
+		return this->lparam;
+	}
+	
+	void AbsFuncBlock::setLparam(double s) {
+		this->lparam = s;
+	}
+
+	AbsFuncBlock* AbsFuncBlock::setMult(AbsFuncBlock* mfb) {
+		int tag = mfb->getTag();
+
+		if (mfb->isMult() && tag == ADD) {
+			return static_cast<AddFuncBlock*>(static_cast<AbsFuncBlock*>(mfb));
+		}
+		else {
+			return mfb;
+		}
+	}
+
+	bool AbsFuncBlock::isExist(AbsFuncBlock* afb) {
+		if (afb == NULL) {
+			return false;
+		}
+		if (afb->isZero()) {
+			delete afb;
+			afb = NULL;
+			return false;
+		}
+		return true;
+	}
+
 
 	/**************************************************************************/
+	AddFuncBlock::~AddFuncBlock() {
+		delete afb[0];
+		delete afb[1];
+	}
+
+
+	void AddFuncBlock::load(AbsFuncBlock* afb0, AbsFuncBlock* afb1) {
+		afb[0] = afb0;
+		afb[1] = afb1;
+	}
+
+
 	void AddFuncBlock::dt() {
-		afb[0]->dt();
-		AddFuncBlock* transBlock;
-		if (afb[0]->getTag() == MULT) {
-			transBlock = static_cast<AddFuncBlock*>(static_cast<AbsFuncBlock*>(afb[0]));
-			transBlock->setTag(ADD);
-			afb[0] = transBlock;
+
+		if (isNor) {
+			isZer = true;
+			return;
 		}
 
-		afb[1]->dt();
-		if (afb[1]->getTag() == MULT) {
-			transBlock = static_cast<AddFuncBlock*>(static_cast<AbsFuncBlock*>(afb[1]));
-			transBlock->setTag(ADD);
-			afb[1] = transBlock;
-	}
+		int tag0, tag1;
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]);
+
+		if (!e0 && !e1) {
+			isZer = true;
+			return;
+		}
+		if (e1) {
+			afb[1]->dt();
+			AbsFuncBlock* t = setMult(afb[1]);
+			afb[1] = t;
+		}
+		if (e0) {
+			afb[0]->dt();
+			AbsFuncBlock* t = setMult(afb[0]);
+			afb[0] = t;
+		}
+		//求完导之后清除0项
+		isExist(afb[0]), isExist(afb[1]);
 	}
 
 
 	std::string AddFuncBlock::rtStr() {
 		//判断纯幂函数串是否为0。
-		if (isZer) {
-			return "";
-		}
-		bool t1, t2;
-		std::string afb0 = afb[0]->rtStr(),
-					afb1 = afb[1]->rtStr();
-		//为0有两种情况，一是初始为零，体现为返回空串
-		//二是一直为0，体现为返回true
-		if (afb0.empty()) {
-			t1 = true;
-		}
-		if (afb1.empty()) {
-			t2 = true;
-		}
-
-		if (t1 && t2) {
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]);
+		//虽然不太可能出现，只会出现在根部
+		if (!e0 && !e1) {
 			isZer = true;
 			return "";
 		}
-		else if (t1) {
-			return afb1;
+		if (!e1) {
+			return afb[0]->rtStr();
 		}
-		else if (t2) {
-			return afb0;
+		if (!e0) {
+			return afb[1]->rtStr();
 		}
+		std::string afb0 = afb[0]->rtStr(), afb1 = afb[1]->rtStr();
+		
 		//加减函数块不用考虑常数。
 		if (tag == ADD) {
 			afb0 = afb0 + "+";
@@ -96,56 +142,98 @@ namespace BasFuncBlock {
 
 
 	AbsFuncBlock* AddFuncBlock::copy() {
-		AbsFuncBlock* blockUnit1, * blockUnit2, * newAfb;
+		AbsFuncBlock* blockUnit0 = NULL, * blockUnit1 = NULL, * newAfb = NULL;
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]);
+		//这种情况也不太可能出现
+		if (!e0 && !e1) {
+			return NULL;
+		}
+		if (e0) {
+			blockUnit0 = afb[0]->copy();
+		}
+		if (e1) {
+			blockUnit1 = afb[1]->copy();
+		}
 		newAfb = new AddFuncBlock;
-		blockUnit1 = afb[0]->copy();
-		blockUnit2 = afb[1]->copy();
-		newAfb->load(blockUnit1, blockUnit2);
+		
+		newAfb->load(blockUnit1, blockUnit1);
 		newAfb->setTag(tag);
+		newAfb->setLparam(lparam);
+
 		return newAfb;
 	}
 
 
 
 	/**************************************************************************/
-	void MultFuncBlock::dt() {
-		AbsFuncBlock* mulUnit1, * mulUnit2, * t1, * t2;
-		mulUnit1 = new MultFuncBlock;
-		mulUnit2 = new MultFuncBlock;
-		t1 = afb[0]->copy();
-		t2 = afb[1]->copy();
-		//乘法法则
-		mulUnit1->load(t1, afb[1]);
-		mulUnit1->setTag(MULT);
-		mulUnit2->load(afb[0], t2);
-		mulUnit2->setTag(MULT);
 
-		afb[0] = mulUnit1;
-		afb[1] = mulUnit2;
+	MultFuncBlock::MultFuncBlock() {
+		isMul = true;
 	}
 
-	//TODO
+
+	MultFuncBlock::~MultFuncBlock(){
+		delete afb[0];
+		delete afb[1];
+	}
+
+
+	void MultFuncBlock::dt() {
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]), flag = false;
+		if (!e0 || !e1) {
+			isZer = true;
+			return;
+		}
+
+		AbsFuncBlock* t0 = NULL, *t1 = NULL;
+		AbsFuncBlock* subBlock0, *subBlock1, *afb0 = afb[0], *afb1 = afb[1];
+		//乘法比较简单，两个都不为0；
+		t0 = afb0->copy();
+		t1 = afb1->copy();
+		t0->dt();
+		t1->dt();
+		//如果求完导为空
+		e0 = isExist(t0);
+		e1 = isExist(t1);
+
+		if (!e0 && !e1) {
+			isZer = 0;
+		}
+
+		if (!e1) {
+			afb[0] = t0;
+			afb[1] = afb1;
+			return;
+		}
+		if (!e0) {
+			afb[0] = afb[0];
+			afb[1] = t1;
+			return;
+		}
+
+		//因为新元一定是完整乘法式，因此不需要setMult
+		subBlock0 = new MultFuncBlock;
+		subBlock0->load(t0, afb1);
+		subBlock1 = new MultFuncBlock;
+		subBlock1->load(afb0, t1);
+		tag = ADD;
+		afb[0] = subBlock0;
+		afb[1] = subBlock1;
+	}
+
+	//TODO 未实现常数归并
 	std::string MultFuncBlock::rtStr() {
-		if (isZer) {
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]);
+		if (!e0 || !e1) {
+			isZer = true;
 			return "";
 		}
-		bool t1, t2;
+		//返回字符不修改函数内容
 		std::string afb1 = afb[0]->rtStr();
 		std::string afb2 = afb[1]->rtStr();
  		int tag1 = afb[0]->getTag(),
 			tag2 = afb[1]->getTag();
-		
-		if (afb1.empty()) {
-			t1 = true;
-		}
-		if (afb2.empty()) {
-			t2 = true;
-		}
-		//如果子块出现0，则返回空串。
-		if (t1 || t2) {
-			isZer = true;
-		return "";
-	}
+	
 
 		std::string rt;
 		if (tag1 / 10 <= 1) {
@@ -159,11 +247,12 @@ namespace BasFuncBlock {
 		rt = rt + "*";
 
 		if (tag2 / 10 <= 1) {
-			rt = "(" + afb2;
+			rt = rt + "(";
+			rt = rt + afb2;
 			rt = rt + ")";
 		}
 		else {
-			rt =afb2;
+			rt = rt+ afb2;
 		}
 
 		return rt;
@@ -171,27 +260,78 @@ namespace BasFuncBlock {
 
 
 	AbsFuncBlock* MultFuncBlock::copy() {
-		AbsFuncBlock* blockUnit1, * blockUnit2, * newAfb;
+		AbsFuncBlock* blockUnit1 = NULL, * blockUnit2 = NULL, * newAfb = NULL;
+		bool e0 = isExist(afb[0]);
+		bool e1 = isExist(afb[1]);
+		if (!e0 || !e1) {
+			isZer = 0;
+			return NULL;
+		}
 		newAfb = new MultFuncBlock;
 		newAfb->setTag(tag);
+		//NULL化已经在dt()中完成
 		blockUnit1 = afb[0]->copy();
 		blockUnit2 = afb[1]->copy();
 		newAfb->load(blockUnit1, blockUnit2);
+		newAfb->setLparam(lparam);
 		return newAfb;
 	}
 
+	/**************************************************************************/
 
-	//TODO
-	void MultFuncBlock::setLpara() {
-		bool tag1 = afb[0]->getTag(),
-			 tag2 = afb[1]->getTag();
+	PwrFuncBlock ::~PwrFuncBlock() {
+		delete afb[0];
+		delete afb[1];
+	}
+
+	void PwrFuncBlock::dt() {
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]);
+		if (!e1) {
+			delete afb[0];
+			afb[0] = NULL;
+			isNor = true;
+			setLparam(1.0);
+		}
+		if (!e0) {
+			delete afb[1];
+			afb[1] = NULL;
+			isZer = true;
+		}
 
 	}
 
+	std::string PwrFuncBlock::rtStr() {
+		if (isZer) {
+			return "";
+		}
+		//TODO需要特判乘法，并将其转换为加法块。
+		int tag0 = afb[0]->getTag(), 
+			tag1 = afb[1]->getTag();
+		bool t0, t1;
+		std::s1 = afb[0]->rtStr(),
+	
+	}
+
+	void load(std::string s);
+
+	AbsFuncBlock* copy();
+
 
 	/**************************************************************************/
+	UnitFuncBlock::~UnitFuncBlock() {
+		
+	}
+
+	//单变量求导一定为常数
 	void UnitFuncBlock::dt() {
-		abf->dt();
+		if (isZer) {
+			return;
+		}
+		if (isNor) {
+			isZer = true;
+		}
+		return;
+		isNor = true;
 	}
 
 
@@ -199,63 +339,101 @@ namespace BasFuncBlock {
 		if (isZer) {
 			return "";
 		}
-
-		//幂函数单元才有0的结果
-		if (tag == PWR) {
-			if (abf->isZero()) {
-				isZer = true;
-				return "";
-			}
+		if (isNor) {
+			return d2str(lparam);
 		}
-		return abf->rtStr();
+		return "x";
 	}
 	
 
 
 	void UnitFuncBlock::load(std::string s) {
-		//单元块load需要switch
-		//TODO
-		if (s.find("arc") != s.npos) {
-
+		if (isNum(s)) {
+			isNor = true;
+			lparam = str2d(s);
 		}
-		else if (s.find("ln") != s.npos) {
-
-		}
-		else if (s.find("s") != s.npos && s.find("tan") != s.npos) {
-
-		}
-		else if (s.find("^x") != s.npos) {
-
-		}
-		else {
-			abf = new BasPwrFunc;
-			tag = PWR;
-		}
-		abf->load(s);
 	}
 
 
 	AbsFuncBlock* UnitFuncBlock::copy() {
-		AbsBasFunc* newAbf;
-		UnitFuncBlock* newAfb = new UnitFuncBlock;
-		newAbf = abf->copy();
-		newAfb->load(newAbf->rtStr());
-		newAfb->setTag(tag);
+		AbsFuncBlock* newAfb = new UnitFuncBlock;
+		newAfb->setTag(UNIT);
+		newAfb->setLparam(lparam);
 		return newAfb;
 	}
 
-
-	void UnitFuncBlock::setLpara(double s) {
-		abf->setLpara(s);
+	double UnitFuncBlock::str2d(std::string s) {
+		int p = 0, len = 5;
+		double f = 1;
+		double ans = 0;
+		double tai = 0;
+		double eps = 1e-6;
+		if (s[p] == '-') {
+			f = -f;
+			p++;
+		}
+		if (s[p] == '+') {
+			p++;
+		}
+		while (s[p] != '.' && p != s.size()) {
+			ans = ans * 10 + ((double)s[p] - '0');
+			p++;
+		}
+		if (p == s.length()) {
+			return f * ans;
+		}
+		p++;
+		while (len-- && p != s.length()) {
+			tai = tai * 10 + s[p] - '0';
+			p++;
+		}
+		while (tai > 1) {
+			tai /= 10;
+		}
+		ans += tai;
+		return ans * f;
 	}
 
 
-	double UnitFuncBlock::getLpara() {
-		return abf->getLpara();
+	std::string UnitFuncBlock::ridz(std::string s) {
+		int p = s.length() - 1;
+		int t = s.length() - 2;
+		while (s[p] != '.' && p) {
+			p--;
+		}
+		if (p == 0) {
+			return s;
+		}
+
+		while (s[t] == '0' && s[t + 1] == '0') {
+			t--;
+		}
+		if (s[t] == '.') {
+			t--;
+		}
+		return s.substr(0, t + 1);
 	}
 
+
+	std::string UnitFuncBlock::d2str(double x) {
+		return ridz(std::to_string(x));
+	}
+
+
+	bool UnitFuncBlock::isNum(std::string s) {
+		for (int i = 0; i < s.size(); i++) {
+			if ((s[i] >= '0' && s[i] <= '9') || s[i] == '-' || s[i] == '.') {
+				continue;
+			}
+			return false;
+		}
+		return true;
+	}
 
 	/**************************************************************************/
+	NoneFuncBlock::~NoneFuncBlock(){}
+
+
 	void  NoneFuncBlock::dt() {}
 
 

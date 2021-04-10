@@ -63,6 +63,7 @@ namespace FuncReader {
 							INCNT++;
 						}
 						q++;
+						r++;
 					}
 					UnitFuncBlock* ufb = new UnitFuncBlock;
 					ufb->load(s.substr(p, q - p));
@@ -88,6 +89,12 @@ namespace FuncReader {
 				ecde.push_back(isSign(s[p]));
 				p++;
 			}
+			
+			if (p >= q) {
+				q++;
+				r++;
+				continue;
+			}
 			UnitFuncBlock* ufb = new UnitFuncBlock;
 			ufb->load(s.substr(p, q - p));
 			que.push(ufb);
@@ -96,6 +103,7 @@ namespace FuncReader {
 				ecde.push_back(isSign(s[q]));
 			}
 			q++;
+			r++;
 			p = q;
 		}
 		trans1();
@@ -192,7 +200,12 @@ namespace FuncReader {
 							break;
 						}
 					}
-					temsta.push(ecde[i]);
+					if (ecde[i] == RINC) {
+						continue;
+					}
+					else {
+						temsta.push(ecde[i]);
+					}
 				}
 				break;
 			}

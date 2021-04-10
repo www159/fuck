@@ -19,6 +19,7 @@ namespace BasFuncBlock {
 #define DIV  20
 #define MINU 11
 	public:
+		virtual ~AbsFuncBlock() {};
 
 		virtual void dt() = 0;
 
@@ -30,8 +31,12 @@ namespace BasFuncBlock {
 		virtual AbsFuncBlock* copy() = 0;
 
 		void setTag(int t);
-
-		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
+		/// <summary>
+		/// 初始化函数块系数为1
+		/// </summary>
+		/// <param name="afb0">左函数块</param>
+		/// <param name="afb1">右函数块</param>
+		virtual void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
 
 		int getTag();
 		/// <summary>
@@ -41,6 +46,23 @@ namespace BasFuncBlock {
 		bool isUnit();
 
 		bool isNorm();
+
+		bool isZero();
+
+		bool isMult();
+
+		double getLparam();
+
+		void setLparam(double s);
+
+		AbsFuncBlock* setMult(AbsFuncBlock* mfb);
+		/// <summary>
+		/// 判断是否为空函数或0函数。
+		/// 如果是0函数则转变为空函数
+		/// </summary>
+		/// <param name="afb">待判断函数</param>
+		/// <returns>true: 该函数为空函数</returns>
+		static bool isExist(AbsFuncBlock* afb);
 
 	protected:
 		/// <summary>
@@ -52,9 +74,17 @@ namespace BasFuncBlock {
 
 		bool isZer = false;
 
+		bool isMul = false;
+
 		AbsFuncBlock* afb[2] = {NULL};
 
+		double lparam;
 
+		/// <summary>
+		/// 用于将乘法块造型为加法块。
+		/// </summary>
+		/// <param name="mfb">乘法块</param>
+		/// <returns>经过造型的乘法块</returns>
 	};
 	/**************************************************************************/
 	/// <summary>
@@ -62,6 +92,13 @@ namespace BasFuncBlock {
 	/// </summary>
 	class AddFuncBlock :public AbsFuncBlock {
 	public:
+		~AddFuncBlock();
+		/// <summary>
+		/// 加法不需要参数合并
+		/// </summary>
+		/// <param name="afb0"></param>
+		/// <param name="afb1"></param>
+		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
 
 		void dt();
 
@@ -80,6 +117,10 @@ namespace BasFuncBlock {
 	/// </summary>
 	class MultFuncBlock :public AbsFuncBlock {
 	public:
+
+		MultFuncBlock();
+
+		~MultFuncBlock();
 		/// <summary>
 		/// 乘法单元求导，需要外部求导造型成加法单元
 		/// 更新两个子单元
@@ -90,15 +131,30 @@ namespace BasFuncBlock {
 
 		AbsFuncBlock* copy();
 		//TODO 增加对0判断
-		void setLpara();
 
 };
+	/**************************************************************************/
+
+	/// <summary>
+	/// 幂指函数块，史上最烦的函数出现了。
+	/// </summary>
+	class PwrFuncBlock :public AbsFuncBlock {
+	public:
+		~PwrFuncBlock();
+
+		void dt();
+
+		std::string rtStr();
+
+		void load(std::string s);
+
+		AbsFuncBlock* copy();
+	};
 	/**************************************************************************/
 	/// <summary>
 	/// 单元块
 	/// 函数块与函数元的交流接口
 	/// </summary>
-	/// <param name="s"></param>
 	class UnitFuncBlock : public AbsFuncBlock {
 
 
@@ -112,6 +168,8 @@ namespace BasFuncBlock {
 
 	public:
 
+		~UnitFuncBlock();
+
 		void dt();
 
 		std::string rtStr();
@@ -123,15 +181,12 @@ namespace BasFuncBlock {
 
 		AbsFuncBlock* copy();
 
-		void setLpara(double s);
-
-		double getLpara();
-
 	private:
 
-		AbsBasFunc* abf = NULL;
-
-
+		double str2d(std::string s);
+		std::string ridz(std::string s);
+		std::string d2str(double x);
+		bool isNum(std::string s);
 	};
 	/**************************************************************************/
 	/// <summary>
@@ -139,6 +194,9 @@ namespace BasFuncBlock {
 	/// </summary>
 	class NoneFuncBlock :public AbsFuncBlock {
 	public:
+
+		~NoneFuncBlock();
+
 		void dt();
 
 		std::string rtStr();
