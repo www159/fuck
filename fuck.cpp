@@ -7,7 +7,7 @@ using namespace FuncReader;
 int main()
 {
 	GnlFuncReader* gfr = new GnlFuncReader;
-	gfr->load("(100x+399x^(-2)*(x+5))");
+	gfr->load("(100*x+399*x^(-2)*(x+5))");
 	AbsFuncBlock* afb = gfr->getAfb();
 	delete gfr;
 	afb->dt();

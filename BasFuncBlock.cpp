@@ -427,6 +427,9 @@ namespace BasFuncBlock {
 
 
 	/**************************************************************************/
+	UnitFuncBlock::UnitFuncBlock() {
+		tag = UNIT;
+	}
 	UnitFuncBlock::~UnitFuncBlock() {
 		
 	}

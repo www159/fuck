@@ -1,109 +1,140 @@
 #include"FuncReader.h"
 namespace FuncReader {
 	using namespace BasFuncBlock;
+	//void GnlFuncReader::load(std::string s) {
+	//	ecde.clear();
+	//	this->end = s.length();
+	//	//连续左括号最左边的下标
+	//	int seqLincs = 0;
+	//	int p, q, r, t, isSpecFunc;
+	//	p = q = 0;
+	//	r = -1;
+	//	t = -1;
+	//	//当前读到的符号下标
+	//	int Signtag = 0;
+	//	int INCNT = 0;
+	//	//这里可以加入sin和log判断
+	//	//连续右括号不能跳
+	//	while (q < end) {
+	//		while ((isSign(s[q]) == NORM || isSign(s[q]) == LINC) && q != end) {
+	//			Signtag = isSign(s[q]);
+	//			//括号累加器操作
+	//			if (Signtag == LINC) {
+	//				INCNT--;
+	//			}
+	//			else if (Signtag == RINC) {
+	//				INCNT++;
+	//			}
+
+	//			//非左括号标识
+	//			if (Signtag != LINC) {
+	//				seqLincs = q;
+	//			}
+
+	//			//如果是读到连续左括号，停下来判断是否为复合函数。
+	//			if (r >= 0 && Signtag == NORM) {
+	//				if (isSign(s[r]) == LINC) {
+	//					break;
+	//				}
+	//			}
+
+	//			q++;
+	//			r++;
+	//		}
+
+	//		//TODO 连续右括号的复合函数先不考虑。
+	//		//不允许空括号的存在
+	//		while (isSign(s[p]) == LINC) {
+	//			INCNT++;
+	//			ecde.push_back(LINC);
+	//			p++;
+	//		}
+
+	//		//TODO 复合函数读取
+	//		//如果q跳过了连续左括号，那么根据非左括号标识判断该连续括号，并借助括号累加器得到完整的复合函数。
+	//		//如果该函数是复合函数，中缀存储器的括号元素将不会更新。
+	//		//附带幂函数的负指数判断。
+	//		isSpecFunc = isSpeFunc(s, seqLincs);
+	//		if ((isSign(s[r]) == LINC && isSpecFunc != -1) || (isSpecFunc != -1 && isSign(s[q]) == MINU)) {
+	//			if (isSpecFunc == PWR) {
+	//				while (INCNT < 0) {
+	//					Signtag = isSign(s[q]);
+	//					if (Signtag == RINC) {
+	//						INCNT++;
+	//					}
+	//					q++;
+	//					r++;
+	//				}
+	//				UnitFuncBlock* ufb = new UnitFuncBlock;
+	//				ufb->load(s.substr(p, q - p));
+	//				que.push(ufb);
+	//				ecde.push_back(NORM);
+	//				if (q != end) {
+	//					ecde.push_back(isSign(s[q]));
+	//				}
+	//				p = q;
+	//			}
+	//			else {
+
+	//			}
+	//			continue;
+	//		}
+
+	//		while (isSign(s[p]) == RINC) {
+	//			ecde.push_back(RINC);
+	//			p++;
+	//		}
+	//		//防止连续括号出现运算符。
+	//		if (isSign(s[p]) != NORM) {
+	//			ecde.push_back(isSign(s[p]));
+	//			p++;
+	//		}
+	//		
+	//		if (p >= q) {
+	//			q++;
+	//			r++;
+	//			continue;
+	//		}
+	//		UnitFuncBlock* ufb = new UnitFuncBlock;
+	//		ufb->load(s.substr(p, q - p));
+	//		que.push(ufb);
+	//		ecde.push_back(NORM);
+	//		if (q != end) {
+	//			ecde.push_back(isSign(s[q]));
+	//		}
+	//		q++;
+	//		r++;
+	//		p = q;
+	//	}
+	//	trans1();
+	//	trans2();
+	//}
+
 	void GnlFuncReader::load(std::string s) {
-		ecde.clear();
-		this->end = s.length();
-		//连续左括号最左边的下标
-		int seqLincs = 0;
-		int p, q, r, t, isSpecFunc;
-		p = q = 0;
-		r = -1;
-		t = -1;
-		//当前读到的符号下标
-		int Signtag = 0;
-		int INCNT = 0;
-		//这里可以加入sin和log判断
-		//连续右括号不能跳
-		while (q < end) {
-			while ((isSign(s[q]) == NORM || isSign(s[q]) == LINC) && q != end) {
-				Signtag = isSign(s[q]);
-				//括号累加器操作
-				if (Signtag == LINC) {
-					INCNT--;
-				}
-				else if (Signtag == RINC) {
-					INCNT++;
-				}
-
-				//非左括号标识
-				if (Signtag != LINC) {
-					seqLincs = q;
-				}
-
-				//如果是读到连续左括号，停下来判断是否为复合函数。
-				if (r >= 0 && Signtag == NORM) {
-					if (isSign(s[r]) == LINC) {
-						break;
-					}
-				}
-
+		int p = 0, q = 0;
+		end = s.length();
+		while (q != end) {
+			while ( isSign(s[q]) == NORM || isSign(s[q]) == LINC) {
 				q++;
-				r++;
 			}
-
-			//TODO 连续右括号的复合函数先不考虑。
-			//不允许空括号的存在
 			while (isSign(s[p]) == LINC) {
-				INCNT++;
 				ecde.push_back(LINC);
 				p++;
 			}
-
-			//TODO 复合函数读取
-			//如果q跳过了连续左括号，那么根据非左括号标识判断该连续括号，并借助括号累加器得到完整的复合函数。
-			//如果该函数是复合函数，中缀存储器的括号元素将不会更新。
-			//附带幂函数的负指数判断。
-			isSpecFunc = isSpeFunc(s, seqLincs);
-			if ((isSign(s[r]) == LINC && isSpecFunc != -1) || (isSpecFunc != -1 && isSign(s[q]) == MINU)) {
-				if (isSpecFunc == PWR) {
-					while (INCNT < 0) {
-						Signtag = isSign(s[q]);
-						if (Signtag == RINC) {
-							INCNT++;
-						}
-						q++;
-						r++;
-					}
-					UnitFuncBlock* ufb = new UnitFuncBlock;
-					ufb->load(s.substr(p, q - p));
-					que.push(ufb);
-					ecde.push_back(NORM);
-					if (q != end) {
-						ecde.push_back(isSign(s[q]));
-					}
-					p = q;
-				}
-				else {
-
-				}
-				continue;
-			}
-
-			while (isSign(s[p]) == RINC) {
-				ecde.push_back(RINC);
-				p++;
-			}
-			//防止连续括号出现运算符。
-			if (isSign(s[p]) != NORM) {
-				ecde.push_back(isSign(s[p]));
-				p++;
-			}
-			
-			if (p >= q) {
+			if (p == q) {
 				q++;
-				r++;
 				continue;
 			}
 			UnitFuncBlock* ufb = new UnitFuncBlock;
 			ufb->load(s.substr(p, q - p));
 			que.push(ufb);
 			ecde.push_back(NORM);
-			if (q != end) {
+			while (q <= end && isSign(s[q]) == RINC && isSign(s[q+1]) != NORM) {
 				ecde.push_back(isSign(s[q]));
+				q++;
 			}
+			ecde.push_back(isSign(s[q]));
 			q++;
-			r++;
 			p = q;
 		}
 		trans1();
@@ -134,6 +165,9 @@ namespace FuncReader {
 		case '/': {
 			return DIV;
 		}
+		case '^': {
+			return PWR;
+		}
 		default: {
 			return -1;
 			break;
@@ -160,17 +194,15 @@ namespace FuncReader {
 			}
 		}
 		if (p > 0) {
+			//幂指函数已经被函数块囊括
 			if (s[p] == 'n') {
 				return ARI;
-			}
-			if (s[p] == '^') {
-				return PWR;
 			}
 		}
 		return -1;
 	}
 	
-
+	//TODO：暂时不需要参数归并（太nm烦了）
 	void GnlFuncReader::trans1() {
 		std::stack<int> temsta;
 		for (int i = 0; i < ecde.size(); i++) {
@@ -184,12 +216,12 @@ namespace FuncReader {
 				if (temsta.empty()) {
 					temsta.push(ecde[i]);
 				}
-				else if (isSmaller(temsta.top(), ecde[i])) {
+				else if (ecde[i] == LINC) {
 					temsta.push(ecde[i]);
 				}
-				else {
+				else if (ecde[i] == RINC) {
 					while (!temsta.empty()) {
-						if (isSmaller(ecde[i], temsta.top())) {
+						if (temsta.top() != LINC) {
 							AbsFuncBlock* afb = new NoneFuncBlock;
 							afb->setTag(temsta.top());
 							bacQue.push(afb);
@@ -200,12 +232,25 @@ namespace FuncReader {
 							break;
 						}
 					}
-					if (ecde[i] == RINC) {
-						continue;
+					temsta.pop();
+				}
+				else if (isSmaller(temsta.top(), ecde[i])) {
+					temsta.push(ecde[i]);
+				}
+				else {
+					while (!temsta.empty()) {
+						if (isSmaller(ecde[i], temsta.top()) && temsta.top() != LINC) {
+							AbsFuncBlock* afb = new NoneFuncBlock;
+							afb->setTag(temsta.top());
+							bacQue.push(afb);
+							temsta.pop();
+							continue;
+						}
+						else {
+							break;
+						}
 					}
-					else {
 						temsta.push(ecde[i]);
-					}
 				}
 				break;
 			}
@@ -229,7 +274,7 @@ namespace FuncReader {
 
 			int tag = afb1->getTag();
 			switch (tag) {
-			case ADD: case MINU:case DIV: case MULT: {
+			case ADD: case MINU:case DIV: case MULT:case PWR: {
 				afb2 = afbStack.top();
 				afbStack.pop();
 				afb3 = afbStack.top();
@@ -265,10 +310,19 @@ namespace FuncReader {
 			return mifb;
 		}
 		case MULT: {
-
+			MultFuncBlock* mfb = new MultFuncBlock;
+			mfb->setTag(MULT);
+			mfb->load(afb1, afb2);
+			return mfb;
 		}
 		case DIV: {
 
+		}
+		case PWR: {
+			PwrFuncBlock* pfb = new PwrFuncBlock;
+			pfb->setTag(PWR);
+			pfb->load(afb1, afb2);
+			return pfb;
 		}
 		default:return NULL;
 		}

@@ -186,6 +186,8 @@ namespace BasFuncBlock {
 
 	public:
 
+		UnitFuncBlock();
+
 		~UnitFuncBlock();
 
 		void dt();
