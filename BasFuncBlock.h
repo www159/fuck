@@ -18,6 +18,10 @@ namespace BasFuncBlock {
 #define ADD  10
 #define DIV  20
 #define MINU 11
+#define PWR 30
+#define ART 1
+#define TRI 2
+#define ARI 3
 	public:
 		virtual ~AbsFuncBlock() {};
 
@@ -36,7 +40,7 @@ namespace BasFuncBlock {
 		/// </summary>
 		/// <param name="afb0">左函数块</param>
 		/// <param name="afb1">右函数块</param>
-		virtual void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
+		virtual void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1) = 0;
 
 		int getTag();
 		/// <summary>
@@ -51,11 +55,23 @@ namespace BasFuncBlock {
 
 		bool isMult();
 
+		bool isOne();
+
 		double getLparam();
 
 		void setLparam(double s);
-
-		AbsFuncBlock* setMult(AbsFuncBlock* mfb);
+		/// <summary>
+		/// 函数转换器
+		/// </summary>
+		/// <param name="mfb">
+		/// 加法会收敛为常数。
+		/// 乘法会收敛为常数。
+		/// 乘法会扩充为加法。
+		///	幂指会收敛为常数。
+		/// 除法会收敛为常数。	
+		///</param>
+		/// <returns></returns>
+		static AbsFuncBlock* trans(AbsFuncBlock* mfb);
 		/// <summary>
 		/// 判断是否为空函数或0函数。
 		/// 如果是0函数则转变为空函数
@@ -76,6 +92,8 @@ namespace BasFuncBlock {
 
 		bool isMul = false;
 
+		bool isOn = false;
+
 		AbsFuncBlock* afb[2] = {NULL};
 
 		double lparam;
@@ -92,6 +110,9 @@ namespace BasFuncBlock {
 	/// </summary>
 	class AddFuncBlock :public AbsFuncBlock {
 	public:
+
+		AddFuncBlock();
+
 		~AddFuncBlock();
 		/// <summary>
 		/// 加法不需要参数合并
@@ -132,6 +153,8 @@ namespace BasFuncBlock {
 		AbsFuncBlock* copy();
 		//TODO 增加对0判断
 
+		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
+
 };
 	/**************************************************************************/
 
@@ -140,13 +163,16 @@ namespace BasFuncBlock {
 	/// </summary>
 	class PwrFuncBlock :public AbsFuncBlock {
 	public:
-		~PwrFuncBlock();
 
+		PwrFuncBlock();
+
+		~PwrFuncBlock();
+		//TODO 未考虑多元乘法。
 		void dt();
 
 		std::string rtStr();
 
-		void load(std::string s);
+		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
 
 		AbsFuncBlock* copy();
 	};
@@ -156,14 +182,6 @@ namespace BasFuncBlock {
 	/// 函数块与函数元的交流接口
 	/// </summary>
 	class UnitFuncBlock : public AbsFuncBlock {
-
-
-#define PWR 1
-#define IND 2
-#define ARI 3
-#define TRI 4
-
-#define ART 5
 
 
 	public:
@@ -178,6 +196,8 @@ namespace BasFuncBlock {
 		/// </summary>
 		/// <param name="s">读入字符串</param>
 		void load(std::string s);
+
+		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
 
 		AbsFuncBlock* copy();
 
@@ -202,6 +222,8 @@ namespace BasFuncBlock {
 		std::string rtStr();
 
 		void load(std::string);
+
+		void load(AbsFuncBlock* afb0, AbsFuncBlock* afb1);
 
 		AbsFuncBlock* copy();
 

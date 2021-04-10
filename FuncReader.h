@@ -13,8 +13,8 @@ namespace FuncReader {
 	/// 复合函数的tag支持掩码。
 	/// </summary>
 	class GnlFuncReader {
-#define LINC 30
-#define RINC 31
+#define LINC 40
+#define RINC 41
 #define COMB 13
 #define NORM -1
 	public:
