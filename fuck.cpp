@@ -7,11 +7,12 @@ using namespace FuncReader;
 int main()
 {
 	GnlFuncReader* gfr = new GnlFuncReader;
-	gfr->load("100x+399x^(-2)");
+	gfr->load("x*x");
 	AbsFuncBlock* afb = gfr->getAfb();
 	delete gfr;
 	afb->dt();
-	afb->dt();
+	AbsFuncBlock* t = static_cast<AddFuncBlock*>(afb);
+	afb = t;
 	std::cout << afb->rtStr() << std::endl;
 	return 0;
 }

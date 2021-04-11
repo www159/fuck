@@ -42,6 +42,38 @@ namespace BasFuncBlock {
 
 		bool isNorm();
 
+		bool isZero();
+
+		bool isMult();
+
+		bool isOne();
+
+		double getLparam();
+
+		void setLparam(double s);
+		/// <summary>
+		/// 类间转化需要类内实现。
+		/// 需要拷贝+删除。
+		/// </summary>
+		/// <param name="mfb">带转化的类</param>
+		/// <returns>转化成的类</returns>
+		virtual AbsFuncBlock* trans(AbsFuncBlock* mfb) = 0;
+		/// <summary>
+		/// 判断是否为空函数或0函数。
+		/// 如果是0函数则转变为空函数
+		/// </summary>
+		/// <param name="afb">待判断函数</param>
+		/// <returns>true: 该函数为空函数</returns>
+		static bool isExist(AbsFuncBlock* afb);
+		/// <summary>
+		/// sym值传递，左边传到右边
+		/// </summary>
+		/// <param name="afb0">待传块，被传块</param>
+		/// <param name="afb1"></param>
+		void copySym(AbsFuncBlock* afb1);
+
+		void setSym(bool isNor, bool isZer, bool isMul, bool isOn);
+
 	protected:
 		/// <summary>
 		/// 通过标识符向下造型
@@ -54,7 +86,7 @@ namespace BasFuncBlock {
 
 		AbsFuncBlock* afb[2] = {NULL};
 
-
+		double lparam;
 	};
 	/**************************************************************************/
 	/// <summary>
@@ -71,6 +103,8 @@ namespace BasFuncBlock {
 		/// </summary>
 		/// <returns>被复制的块</returns>
 		AbsFuncBlock* copy();
+
+		AbsFuncBlock* trans(AbsFuncBlock* afb);
 		
 	};
 	/**************************************************************************/

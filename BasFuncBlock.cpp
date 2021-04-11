@@ -37,6 +37,68 @@ namespace BasFuncBlock {
 	}
 
 
+	bool AbsFuncBlock::isZero() {
+		return isZer;
+	}
+
+
+	bool AbsFuncBlock::isOne() {
+		return isOn;
+	}
+
+
+	bool AbsFuncBlock::isMult() {
+		return isMul;
+	}
+
+
+	void AbsFuncBlock::copySym(AbsFuncBlock* afb1) {
+		afb1->setSym(isNor, isZer, isMul, isOn);
+	}
+
+
+	double AbsFuncBlock::getLparam() {
+		return this->lparam;
+	}
+	
+	void AbsFuncBlock::setLparam(double s) {
+		this->lparam = s;
+	}
+
+	AbsFuncBlock* AbsFuncBlock::trans(AbsFuncBlock* mfb) {
+		int tag = mfb->getTag();
+		if (mfb->isNorm() || mfb->isOne()) {
+			return static_cast<UnitFuncBlock*>(static_cast<AbsFuncBlock*>(mfb));
+		}
+		else if (mfb->isMult() && tag == ADD) {
+			return static_cast<AddFuncBlock*>(static_cast<AbsFuncBlock*>(mfb));
+		}
+		else {
+			return mfb;
+		}
+	}
+
+	bool AbsFuncBlock::isExist(AbsFuncBlock* afb) {
+		if (afb == NULL) {
+			return false;
+		}
+		if (afb->isZero()) {
+			delete afb;
+			afb = NULL;
+			return false;
+		}
+		return true;
+	}
+
+
+	void AbsFuncBlock::setSym(bool isNor, bool isZer, bool isMul, bool isOn) {
+		this->isNor = isNor;
+		this->isZer = isZer;
+		this->isMul = isMul;
+		this->isOn = isOn;
+	}
+
+
 	/**************************************************************************/
 	void AddFuncBlock::dt() {
 		afb[0]->dt();
@@ -102,11 +164,16 @@ namespace BasFuncBlock {
 		blockUnit2 = afb[1]->copy();
 		newAfb->load(blockUnit1, blockUnit2);
 		newAfb->setTag(tag);
+		newAfb->setLparam(lparam);
+		copySym(newAfb);
+
 		return newAfb;
 	}
 
 
-
+	AbsFuncBlock* AddFuncBlock::trans(AbsFuncBlock* afb) {
+		
+	}
 	/**************************************************************************/
 	void MultFuncBlock::dt() {
 		AbsFuncBlock* mulUnit1, * mulUnit2, * t1, * t2;
@@ -177,6 +244,7 @@ namespace BasFuncBlock {
 		blockUnit1 = afb[0]->copy();
 		blockUnit2 = afb[1]->copy();
 		newAfb->load(blockUnit1, blockUnit2);
+		copySym(newAfb);
 		return newAfb;
 	}
 
@@ -209,7 +277,29 @@ namespace BasFuncBlock {
 		}
 		return abf->rtStr();
 	}
-	
+
+
+	AbsFuncBlock* PwrFuncBlock::copy() {
+		AbsFuncBlock* newAfb, * subBlock0, * subBlock1;
+		bool e0 = isExist(afb[0]), e1 = isExist(afb[1]);
+		if (!e0) {
+			delete afb[1];
+			isZer = true;
+			return NULL;
+		}
+		if (!e1) {
+			delete afb[0];
+			UnitFuncBlock* uafb = new UnitFuncBlock;
+			uafb->load("1.0");
+			return uafb;
+		}
+		subBlock0 = afb[0]->copy();
+		subBlock1 = afb[1]->copy();
+		newAfb = new PwrFuncBlock;
+		newAfb->load(subBlock0, subBlock1);
+		copySym(newAfb);
+		return newAfb;
+	}
 
 
 	void UnitFuncBlock::load(std::string s) {
@@ -220,8 +310,19 @@ namespace BasFuncBlock {
 		}
 		else if (s.find("ln") != s.npos) {
 
+	//单变量求导一定为常数
+	void UnitFuncBlock::dt() {
+		if (isZer) {
+			return;
 		}
-		else if (s.find("s") != s.npos && s.find("tan") != s.npos) {
+		if (isNor) {
+			isZer = true;
+			return;
+		}
+		lparam = 1.0;
+		isNor = true;
+	}
+
 
 		}
 		else if (s.find("^x") != s.npos) {
@@ -236,11 +337,10 @@ namespace BasFuncBlock {
 
 
 	AbsFuncBlock* UnitFuncBlock::copy() {
-		AbsBasFunc* newAbf;
-		UnitFuncBlock* newAfb = new UnitFuncBlock;
-		newAbf = abf->copy();
-		newAfb->load(newAbf->rtStr());
-		newAfb->setTag(tag);
+		AbsFuncBlock* newAfb = new UnitFuncBlock;
+		newAfb->setTag(UNIT);
+		newAfb->setLparam(lparam);
+		copySym(newAfb);
 		return newAfb;
 	}
 

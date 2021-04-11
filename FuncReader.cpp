@@ -38,6 +38,41 @@ namespace FuncReader {
 					}
 				}
 
+	//		while (isSign(s[p]) == RINC) {
+	//			ecde.push_back(RINC);
+	//			p++;
+	//		}
+	//		//防止连续括号出现运算符。
+	//		if (isSign(s[p]) != NORM) {
+	//			ecde.push_back(isSign(s[p]));
+	//			p++;
+	//		}
+	//		
+	//		if (p >= q) {
+	//			q++;
+	//			r++;
+	//			continue;
+	//		}
+	//		UnitFuncBlock* ufb = new UnitFuncBlock;
+	//		ufb->load(s.substr(p, q - p));
+	//		que.push(ufb);
+	//		ecde.push_back(NORM);
+	//		if (q != end) {
+	//			ecde.push_back(isSign(s[q]));
+	//		}
+	//		q++;
+	//		r++;
+	//		p = q;
+	//	}
+	//	trans1();
+	//	trans2();
+	//}
+
+	void GnlFuncReader::load(std::string s) {
+		int p = 0, q = 0;
+		end = s.length();
+		while (q <= end) {
+			while ((isSign(s[q]) == NORM || isSign(s[q]) == LINC) && q < end) {
 				q++;
 				r++;
 			}
@@ -95,6 +130,10 @@ namespace FuncReader {
 			if (q != end) {
 				ecde.push_back(isSign(s[q]));
 			}
+			if (q == end) {
+				break;
+			}
+			ecde.push_back(isSign(s[q]));
 			q++;
 			p = q;
 		}
@@ -196,13 +235,13 @@ namespace FuncReader {
 				}
 				break;
 			}
-				   while (!temsta.empty()) {
-					   AbsFuncBlock* afb = new NoneFuncBlock;
-					   afb->setTag(temsta.top());
-					   bacQue.push(afb);
-					   temsta.pop();
-				   }
 			}
+		}
+		while (!temsta.empty()) {
+			AbsFuncBlock* afb = new NoneFuncBlock;
+			afb->setTag(temsta.top());
+			bacQue.push(afb);
+			temsta.pop();
 		}
 	}
 
