@@ -18,24 +18,36 @@
     <ClCompile Include="fuck.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="BasFunc.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="AbsFuncBlock.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="BasFuncBlock.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="AbsFuncDerivator.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FuncReader.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="AbsFuncLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AbsFuncWriter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AbsFuncReducer.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BasFunc.h">
+    <ClInclude Include="AbsFuncBlock.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="BasFuncBlock.h">
+    <ClInclude Include="AbsFuncDerivator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FuncReader.h">
+    <ClInclude Include="AbsFuncLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AbsFuncWriter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AbsFuncReducer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
