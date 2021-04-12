@@ -35,13 +35,9 @@ namespace FuncDre {
 		void setTag(int tag);
 
 	protected:
-		//该块的类型，是基块还是运算块
-		int tag = DEAFULTTAG;
-		/**
-		*	函数容器，是一个线性容器。
-		*	如果复合，那么存的是函数作用域内的子块。
-		*	如果是幂指函数，还需要分类，还需要继承。
-		*/
+		
+		int tag = DEAFULTTAG;//该块的类型，是基块还是运算块
+
 	};
 
 
@@ -78,10 +74,12 @@ namespace FuncDre {
 		OperFuncBlock();
 
 		~OperFuncBlock();
-		
-		std::list<AbsFuncBlock*>* getContainer();//外界获得作用域。
-		
-		void addFunc(AbsFuncBlock* absFuncBlock);//向作用域中增加函数。
+
+		//外界获得作用域。
+		std::list<AbsFuncBlock*>* getContainer();
+
+		//向作用域中增加函数。
+		void addFunc(AbsFuncBlock* absFuncBlock);
 
 	protected:
 
@@ -107,9 +105,11 @@ namespace FuncDre {
 
 		void addBottomFunc(AbsFuncBlock* absFuncBlcok);
 		
-		std::list<AbsFuncBlock*>* getTopContainer();//外界获得上作用域。
+		//外界获得上作用域。
+		std::list<AbsFuncBlock*>* getTopContainer();
 		
-		void addTopFunc(AbsFuncBlock* absFuncBlock);//向上作用域中增加函数。
+		//向上作用域中增加函数。
+		void addTopFunc(AbsFuncBlock* absFuncBlock);
 
 	private:
 		
