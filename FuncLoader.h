@@ -19,6 +19,7 @@ namespace FuncDre {
 	*	2.	化简功能独立。拥有加载和加载-化简功能
 	*		(方便测试)。
 	*	3.	对于浮点数的读取，正则化处理一切。
+	*	4.	减法当作加法处理。
 	*
 	*	因为不需要反复new，队列空间管理交给栈处
 	*	理。
@@ -28,12 +29,15 @@ namespace FuncDre {
 	*	2.	幂指型，直接刚
 	*
 	*	替换规则：浮点数为C, 复合块为U, 常变量为x。
+	* 
+	*	后缀表达式是个好东西：
+	*	1.	后根序，先根序，中根序不改变叶子节点的顺序。
+	*	2.	自动去除冗余括号。
 	*/
 #define		CON		0		//常数
 #define		UNI		1		//复合块
 #define		VAR		3		//变量
 #define		ADD		10		//加号
-#define		MINU	11		//减号
 #define		MULT	20		//乘号
 #define		DIV		21		//除号
 #define		PWR		30		//乘幂
@@ -63,7 +67,7 @@ namespace FuncDre {
 
 		std::queue<AbsFuncBlock*>* comQue;		//存复合块的queue。
 
-		std::queue<AbsFuncBlock*>* bacQue;		//存后缀表达式的list,当bacQue用。
+		std::queue<int>* bacQue;		//存后缀表达式的list,当bacQue用。
 
 		std::stack<AbsFuncBlock*>* AddStack;	//存加法块的临时栈。
 
@@ -76,17 +80,23 @@ namespace FuncDre {
 		//第二次转化，将预处理得到的浅层抽象化为后缀表达式。
 		void trans2(std::string str);
 
-		//第三次转化，将后缀表达式转化为块。亿点点细节。
+		//第三次转化，将后缀表达式转化为块。亿点点细节，需要考虑连乘，连加。
 		void trans3();
 
-		//判断sign是否为复合块。
-		int isComb(int sign);
+		//判断运算符优先级，返回true:sign1 < sign2。
+		bool isSmaller(int sign1, int sign2);
 
 		//字符到宏定义的映射。
 		int isSign(char c);
 
 		//找到第一个子复合块并返回。直到生成所有子复合块后再替换常数块。
 		void workSubComb(std::string& str);
+
+		//从临时栈，加法栈，乘法栈中得到临时函数块。
+		AbsFuncBlock* getFuncInStack(int Sign, std::stack<AbsFuncBlock*>* temStack);
+
+		//将函数块存到临时栈，加法栈，乘法栈中。
+		void pushFuncInStack(int Sign, std::stack<AbsFuncBlock*>* temStack);
 	};
 }
 

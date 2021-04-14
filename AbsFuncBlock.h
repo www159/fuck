@@ -2,11 +2,10 @@
 
 #include<list>
 namespace FuncDre {
-#define DEAFULTTAG     -1			//默认标签，用于初始化
+#define DEFAULTTAG     -1			//默认标签，用于初始化
 #define CONBLOCK        0			//常数，无复合运算
 #define BASBLOCK        1			//代表x的函数块，无复合运算
-#define ADDBLOCK        2			//加法块，需要引入一个函数容器
-#define MINBLOCK        3			//减法块
+#define ADDBLOCK        2			//加法块，需要引入一个函数容器，无减法块。
 #define MULTBLOCK       4			//乘法块
 #define DIVBLOCK        5			//除法块
 #define CONPWRBLOCK     6			//幂函数块
@@ -36,7 +35,7 @@ namespace FuncDre {
 
 	protected:
 		
-		int tag = DEAFULTTAG;//该块的类型，是基块还是运算块
+		int tag = DEFAULTTAG;//该块的类型，是基块还是运算块
 
 	};
 

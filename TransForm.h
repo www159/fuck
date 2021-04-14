@@ -1,6 +1,9 @@
 #pragma once
-//转接头，字符转double
 #include<string>
+/*
+*	转接头，用于double和string之间相互转化。
+*	还有去除小数多余0的功能。
+*/
 class TransForm
 {
 public:
