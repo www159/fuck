@@ -24,13 +24,16 @@
     <ClCompile Include="AbsFuncDerivator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="AbsFuncLoader.cpp">
+    <ClCompile Include="FuncLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="AbsFuncWriter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="AbsFuncReducer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransForm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,13 +44,16 @@
     <ClInclude Include="AbsFuncDerivator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AbsFuncLoader.h">
+    <ClInclude Include="FuncLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AbsFuncWriter.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AbsFuncReducer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TransForm.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

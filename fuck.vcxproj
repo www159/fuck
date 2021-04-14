@@ -141,17 +141,19 @@
   <ItemGroup>
     <ClCompile Include="AbsFuncBlock.cpp" />
     <ClCompile Include="AbsFuncDerivator.cpp" />
-    <ClCompile Include="AbsFuncLoader.cpp" />
+    <ClCompile Include="FuncLoader.cpp" />
     <ClCompile Include="AbsFuncReducer.cpp" />
     <ClCompile Include="AbsFuncWriter.cpp" />
     <ClCompile Include="fuck.cpp" />
+    <ClCompile Include="TransForm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbsFuncBlock.h" />
     <ClInclude Include="AbsFuncDerivator.h" />
-    <ClInclude Include="AbsFuncLoader.h" />
+    <ClInclude Include="FuncLoader.h" />
     <ClInclude Include="AbsFuncReducer.h" />
     <ClInclude Include="AbsFuncWriter.h" />
+    <ClInclude Include="TransForm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
