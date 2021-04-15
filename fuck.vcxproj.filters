@@ -56,5 +56,8 @@
     <ClInclude Include="TransForm.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Hashable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

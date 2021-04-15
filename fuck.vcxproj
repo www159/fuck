@@ -153,6 +153,7 @@
     <ClInclude Include="FuncLoader.h" />
     <ClInclude Include="AbsFuncReducer.h" />
     <ClInclude Include="AbsFuncWriter.h" />
+    <ClInclude Include="Hashable.h" />
     <ClInclude Include="TransForm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

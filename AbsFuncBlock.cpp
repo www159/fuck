@@ -8,6 +8,10 @@ namespace FuncDre {
 
 	}
 
+	int AbsFuncBlock::hashCode() {
+		return BASBLOCK;
+	}
+
 	int AbsFuncBlock::getTag() {
 		return this->tag;
 	}
@@ -23,6 +27,14 @@ namespace FuncDre {
 	*/
 	ConFuncBlock::~ConFuncBlock() {
 
+	}
+
+	int ConFuncBlock::hasCode() {
+		std::string str = TransForm::d2str(num);
+		int hash, i;
+		for (hash = str.length(), i = 0; i < str.length(); ++i)
+			hash = (hash << 4) ^ (hash >> 28) ^ str[i];
+		return (hash % 99999989);
 	}
 
 	double ConFuncBlock::getNum() {
@@ -49,6 +61,14 @@ namespace FuncDre {
 		delete FuncContainer;
 	}
 
+	int OperFuncBlock::hashCode() {
+		int hash;
+		std::list<AbsFuncBlock*>::iterator it = FuncContainer->begin();
+		for (hash = FuncContainer->size(); it != FuncContainer->end(); it++)
+			hash = (hash << 4) ^ (hash >> 28) ^ (*it)->hashCode();
+		return (hash % 99999989);
+	}
+
 	std::list<AbsFuncBlock*>* OperFuncBlock::getContainer() {
 		return this->FuncContainer;
 	}
@@ -72,6 +92,12 @@ namespace FuncDre {
 	GnlFuncBlock::~GnlFuncBlock() {
 		delete BottomBlock;
 		delete TopBlock;
+	}
+
+	int GnlFuncBlock::hashCode() {
+		int hash1 = BottomBlock->hashCode(),
+			hash2 = TopBlock->hashCode();
+		return	(hash1 << 4) ^ (hash2 >> 28);
 	}
 
 	std::list<AbsFuncBlock*>* GnlFuncBlock::getBottomContainer() {

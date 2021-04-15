@@ -7,8 +7,8 @@ namespace FuncDre {
 		conQue		=	new std::queue<AbsFuncBlock*>;
 		comQue		=	new std::queue<AbsFuncBlock*>;
 		bacQue		=	new std::queue<int>;
-		AddStack	=	new std::stack<AbsFuncBlock*>;
-		MulStack	=	new std::stack<AbsFuncBlock*>;
+		AddStack	=	new std::stack<OperFuncBlock*>;
+		MulStack	=	new std::stack<OperFuncBlock*>;
 	}
 
 
@@ -19,6 +19,12 @@ namespace FuncDre {
 		delete bacQue;
 		delete AddStack;
 		delete MulStack;
+	}
+
+
+
+	AbsFuncBlock* FuncLoader::getFinalFunc() {
+		return finalAbsFuncBlock;
 	}
 
 
@@ -79,19 +85,19 @@ namespace FuncDre {
 			else {
 				switch (sign) {
 
-				case LINC: {
+				case LINC:
 					temStack->push(sign);
 					break;
-				}
-				case RINC: {//保证括号成对出现。
+		
+				case RINC://保证括号成对出现。
 					while (temStack->top() != LINC) {
 						bacQue->push(temStack->top());
 						temStack->pop();
 					}
 					temStack->pop();
 					break;
-				}
-				default: {
+		
+				default: 
 					if (temStack->empty()) {
 						temStack->push(sign);
 					}
@@ -103,7 +109,6 @@ namespace FuncDre {
 						temStack->push(sign);
 					}
 					break;
-				}
 				}
 			}
 		}
@@ -117,55 +122,120 @@ namespace FuncDre {
 
 
 	void FuncLoader::trans3() {
-		int sign = -1, lastSign = -1, lastSign2 = -1;
+		int sign = -1;
+		int lastSign = -1,	//记录上一个运算块的符号(不是函数块)。
+			lastSign2 = -1;	//记录上上个运算块的符号(不是函数块)。
 		std::stack<AbsFuncBlock*>* temStack = new std::stack<AbsFuncBlock*>;
 		while (!bacQue->empty()) {
-			lastSign2 = lastSign;
-			lastSign = sign;
 			sign = bacQue->front();
 			switch (sign) {
-			case CON: {
+			case CON: 
 				temStack->push(conQue->front());
 				conQue->pop();
 				break;
-			}
-			case VAR: {
+
+			case VAR: 
 				AbsFuncBlock* absFuncBlock = new AbsFuncBlock;
 				absFuncBlock->setTag(BASBLOCK);
 				temStack->push(absFuncBlock);
 				break;
-			}
-			case UNI: {
+
+			case UNI: 
 				temStack->push(comQue->front());
 				comQue->pop();
 				break;
-			}
 
-			case DIV:{//TODO
+			case DIV:
 				GnlFuncBlock* divFuncBlock = new GnlFuncBlock;
-				divFuncBlock->setTag(DIVBLOCK); 
-				if (lastSign2 == -1) {
-					
+
+				//分母位置。
+				AbsFuncBlock* absFuncBlockInStack = pollBlockInStack(lastSign, temStack);
+				divFuncBlock->addBottomFunc(absFuncBlockInStack);
+
+				//分子位置。
+				absFuncBlockInStack = pollBlockInStack(lastSign2, temStack);
+				divFuncBlock->addTopFunc(absFuncBlockInStack);
+
+				//设置除法块标签。
+				divFuncBlock->setTag(DIVBLOCK);
+
+				//压栈。
+				temStack->push(divFuncBlock);
+
+				lastSign2 = lastSign;
+				lastSign = DIV;
+				break;
+
+			case PWR:
+				int tag1, tag2;
+				GnlFuncBlock* pwrFuncBlock = new GnlFuncBlock;
+
+				//幂位置。
+				AbsFuncBlock* absFuncBlockInStack = pollBlockInStack(lastSign, temStack);
+				tag1 = absFuncBlockInStack->getTag();
+				pwrFuncBlock->addTopFunc(absFuncBlockInStack);
+
+				//基位置。
+				absFuncBlockInStack = pollBlockInStack(lastSign2, temStack);
+				tag2 = absFuncBlockInStack->getTag();
+				pwrFuncBlock->addBottomFunc(absFuncBlockInStack);
+
+				//设置幂块标签。
+				if (tag1 == CONBLOCK) {
+					pwrFuncBlock->setTag(CONPWRBLOCK);
 				}
-				else if (lastSign == ADD) {
-
+				else if (tag2 == CONBLOCK) {
+					pwrFuncBlock->setTag(BASPWRBLOCK);
 				}
-				else if (lastSign == MULT) {
-
+				else {
+					pwrFuncBlock->setTag(GNLPWRBLOCK);
 				}
-			}
-			case PWR: {
 
-			}
-			case ADD: {
+				//压栈。
+				temStack->push(pwrFuncBlock);
 
-			}
-			case MULT:{
+				lastSign2 = lastSign;
+				lastSign = PWR;
+				break;
 
-			}
-			default: {
+			case ADD: //普通栈转移。
+				switch (lastSign) {
+				case ADD://从临时栈中转移到加法栈
+					AbsFuncBlock* absFuncBlockInStack = pollBlockInStack(CON, temStack);
+					AddStack->top()->addFunc(absFuncBlockInStack);
+					break;
+				default://从临时栈中选两个压进加法栈
+					OperFuncBlock* addFuncBlock = new OperFuncBlock;
 
-			}
+					//保证后缀表达式准确无误
+					addFuncBlock->addFunc(pollBlockInStack(CON, temStack));
+					addFuncBlock->addFunc(pollBlockInStack(CON, temStack));
+					AddStack->push(addFuncBlock);
+					break;
+				}
+				lastSign = ADD;//只修改lastSign, lastSign2是留给二元块用的。
+				break;
+
+			case MULT://原理同加法块。
+				switch (lastSign) {
+				case MULT:
+					AbsFuncBlock* absFuncBlockInStack = pollBlockInStack(CON, temStack);
+					MulStack->top()->addFunc(absFuncBlockInStack);
+					break;
+				default:
+					OperFuncBlock* addFuncBlock = new OperFuncBlock;
+					addFuncBlock->addFunc(pollBlockInStack(CON, temStack));
+					addFuncBlock->addFunc(pollBlockInStack(CON, temStack));
+					AddStack->push(addFuncBlock);
+					break;
+				}
+				lastSign = MULT;
+				break;
+
+			default: //应该没有别的情况了⑧
+				
+				break;
+
 			}
 
 			
@@ -261,4 +331,61 @@ namespace FuncDre {
 			len = str.length();
 		}
 	}
+
+
+
+	AbsFuncBlock* FuncLoader::pollBlockInStack(int sign, std::stack<AbsFuncBlock*>* temStack) {
+		switch (sign) {
+		case ADD:
+			AbsFuncBlock* absFuncBlock = AddStack->top();
+			AddStack->pop();
+			return absFuncBlock;
+		
+		case MULT: 
+			AbsFuncBlock* absFuncBlock = MulStack->top();
+			MulStack->pop();
+			return absFuncBlock;
+
+		default:
+			AbsFuncBlock* absFuncBlock = temStack->top();
+			temStack->pop();
+			return absFuncBlock;
+		}
+	}
+
+
+
+	/*void  FuncLoader::pushBlockInStack(int sign, AbsFuncBlock* absFuncBlock, std::stack<AbsFuncBlock*>* temStack) {
+		switch (sign) {
+		case ADD:
+			if (AddStack->empty()) {
+				OperFuncBlock* addFuncBlock = new OperFuncBlock;
+				addFuncBlock->setTag(ADDBLOCK);
+				addFuncBlock->addFunc(absFuncBlock);
+				AddStack->push(addFuncBlock);
+			}
+			else {
+				OperFuncBlock* addFuncBlock = static_cast<OperFuncBlock*>(AddStack->top());
+				addFuncBlock->addFunc(absFuncBlock);
+			}
+			break;
+
+		case MULT:
+			if (MulStack->empty()) {
+				OperFuncBlock* mulFuncBlock = new OperFuncBlock;
+				mulFuncBlock->setTag(MULTBLOCK);
+				mulFuncBlock->addFunc(absFuncBlock);
+				MulStack->push(mulFuncBlock);
+			}
+			else {
+				OperFuncBlock* mulFuncBlock = static_cast<OperFuncBlock*>(MulStack->top());
+				mulFuncBlock->addFunc(absFuncBlock);
+			}
+			break;
+
+		default:
+			temStack->push(absFuncBlock);
+			break;
+		}
+	}*/
 }

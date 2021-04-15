@@ -1,6 +1,8 @@
 #pragma once
 
 #include<list>
+#include"Hashable.h"
+#include"TransForm.h"
 namespace FuncDre {
 #define DEFAULTTAG     -1			//默认标签，用于初始化
 #define CONBLOCK        0			//常数，无复合运算
@@ -23,11 +25,13 @@ namespace FuncDre {
 	*没多大作用，只是存容器方便。
 	*可以囊括常数块和基本块
 	*/
-	class AbsFuncBlock
+	class AbsFuncBlock: public Hashable
 	{
 	public:
 
 		virtual ~AbsFuncBlock();
+
+		int hashCode();
 
 		int getTag();
 
@@ -49,6 +53,8 @@ namespace FuncDre {
 	public:
 
 		~ConFuncBlock();
+
+		int hasCode();
 
 		double getNum();
 
@@ -73,6 +79,8 @@ namespace FuncDre {
 		OperFuncBlock();
 
 		~OperFuncBlock();
+
+		int hashCode();
 
 		//外界获得作用域。
 		std::list<AbsFuncBlock*>* getContainer();
@@ -99,6 +107,8 @@ namespace FuncDre {
 		GnlFuncBlock();
 
 		~GnlFuncBlock();
+
+		int hashCode();
 
 		std::list<AbsFuncBlock*>* getBottomContainer();
 

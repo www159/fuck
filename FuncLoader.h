@@ -33,6 +33,7 @@ namespace FuncDre {
 	*	后缀表达式是个好东西：
 	*	1.	后根序，先根序，中根序不改变叶子节点的顺序。
 	*	2.	自动去除冗余括号。
+	* 
 	*/
 #define		CON		0		//常数
 #define		UNI		1		//复合块
@@ -67,11 +68,11 @@ namespace FuncDre {
 
 		std::queue<AbsFuncBlock*>* comQue;		//存复合块的queue。
 
-		std::queue<int>* bacQue;		//存后缀表达式的list,当bacQue用。
+		std::queue<int>* bacQue;				//存后缀表达式的list,当bacQue用。
 
-		std::stack<AbsFuncBlock*>* AddStack;	//存加法块的临时栈。
+		std::stack<OperFuncBlock*>* AddStack;	//存加法块的临时栈。
 
-		std::stack<AbsFuncBlock*>* MulStack;	//存乘法块的临时栈。
+		std::stack<OperFuncBlock*>* MulStack;	//存乘法块的临时栈。
 
 
 		//第一次转化，利用正则表达式得到顺序常数队列，并添加完全乘号。
@@ -92,11 +93,11 @@ namespace FuncDre {
 		//找到第一个子复合块并返回。直到生成所有子复合块后再替换常数块。
 		void workSubComb(std::string& str);
 
-		//从临时栈，加法栈，乘法栈中得到临时函数块。
-		AbsFuncBlock* getFuncInStack(int Sign, std::stack<AbsFuncBlock*>* temStack);
+		//模仿java的poll操作。
+		AbsFuncBlock* pollBlockInStack(int sign, std::stack<AbsFuncBlock*>* temStack);
 
-		//将函数块存到临时栈，加法栈，乘法栈中。
-		void pushFuncInStack(int Sign, std::stack<AbsFuncBlock*>* temStack);
+		//从三个栈中挑东西。有点鸡肋。
+		/*void pushBlockInStack(int sign, AbsFuncBlock* absFuncBlock, std::stack<AbsFuncBlock*>* temStack);*/
 	};
 }
 
